@@ -83,7 +83,9 @@ void setup() {
     digitalWrite(waterRelay, HIGH);
     digitalWrite(lightRelay, HIGH);
     dht.begin();
+}
 
+void loop() {
     //Read information from moisture sensor
     moisture = analogRead(moistSensor); // lower is wetter, higher is dryer about 1000-3000
     Serial.print("Moisture: ");

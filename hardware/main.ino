@@ -53,7 +53,8 @@ String anon_key = "";
 const String email = "hello@sproutscouts.com";
 const String password = "test1234";
 
-
+//Setup for JSON Document
+DynamicJsonDocument doc(192);
 
 void setup() {
     //Establish wifi connection
@@ -113,6 +114,7 @@ void loop() {
     // Compute heat index in Celsius (isFahreheit = false)
     hic = dht.computeHeatIndex(cel, humidity, false);
 
+    //Print data
     Serial.print(F("Humidity: "));
     Serial.print(humidity);
     Serial.print(F("%  Temperature: "));
@@ -148,10 +150,29 @@ void loop() {
     String read = db.from("plants").select("*").limit(1).doSelect();
     //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
     Serial.println(read); //read from DB
+    
+    //CREATE JSON 
+    /*"created_at": "",
+    "name": "plant2",
+    "owner_id": "",
+    "temperature": 6.5,
+    "humidity": 7.5,
+    "soil_moisture": 10,
+    "light": 15*/
+    doc["created_at"] = "";
+    doc["name"] = "Plant One";
+    doc["owner_id"] = "";
+    doc["temperature"] = fahr;
+    doc["humidity"] = hif;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal;
+    serializeJson(doc, JSON);
+    // This prints:
+    // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
     //WRITE TO DB
     table = "plants"; //set table you wanto write to
-    JSON = "";  //Put your JSON that you want to insert rows
+    //JSON = "";  //Put your JSON that you want to insert rows
     code = db.insert(table, JSON, upsert); //write to db
     Serial.println(code);
 

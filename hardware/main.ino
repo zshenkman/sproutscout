@@ -3,9 +3,14 @@
 #include <WiFi.h>
 #include <esp_wifi.h>
 #include <ESP32_Supabase.h> 
+#include "ArduinoJson.h"
 
-//Supabase Setup
-Supabase db;
+//Supabase DB Setup
+  Supabase db; 
+  String table = "plants";// Put your target table 
+  String JSON; // Put your JSON that you want to insert rows
+  bool upsert = false;
+  int code; 
 
 //Wifi Setup
 /*
@@ -40,14 +45,15 @@ int moisture;
 float hif;
 float hic;
 
-// Put your supabase URL and Anon key here...
-// Because Login already implemented, there's no need to use secretrole key
-String supabase_url = "";
+//Supabase API Setup
+String supabase_url = "https://xzissfgunvpzgocavmvi.supabase.co";
 String anon_key = "";
 
-// Put Supabase account credentials here
+// Supabase credentials
 const String email = "hello@sproutscouts.com";
 const String password = "test1234";
+
+
 
 void setup() {
     //Establish wifi connection
@@ -103,9 +109,9 @@ void loop() {
     }
 
     // Compute heat index in Fahrenheit (the default)
-    hif = dht.computeHeatIndex(f, h);
+    hif = dht.computeHeatIndex(fahr, humidity);
     // Compute heat index in Celsius (isFahreheit = false)
-    hic = dht.computeHeatIndex(t, h, false);
+    hic = dht.computeHeatIndex(cel, humidity, false);
 
     Serial.print(F("Humidity: "));
     Serial.print(humidity);
@@ -137,9 +143,18 @@ void loop() {
     // Logging in with your account you made in Supabase
     db.login_email(email, password);
 
-    // Select query with filter and order, limiting the result is mandatory here
+    // READ FROM DB
+    //query 
     String read = db.from("plants").select("*").limit(1).doSelect();
-    
     //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
-    Serial.println(read);
+    Serial.println(read); //read from DB
+
+    //WRITE TO DB
+    table = "plants"; //set table you wanto write to
+    JSON = "";  //Put your JSON that you want to insert rows
+    code = db.insert(table, JSON, upsert); //write to db
+    Serial.println(code);
+
+    //delay process
+    delay(30000);
 }

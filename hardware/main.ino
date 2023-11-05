@@ -42,23 +42,12 @@ float hic;
 
 // Put your supabase URL and Anon key here...
 // Because Login already implemented, there's no need to use secretrole key
-String supabase_url = "https://xzissfgunvpzgocavmvi.supabase.co";
+String supabase_url = "";
+String anon_key = "";
 
 // Put Supabase account credentials here
 const String email = "hello@sproutscouts.com";
 const String password = "test1234";
-
-void setup() {
-
-  Serial.begin(115200);
-    WiFi.begin(ssid, wifi_password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(1000);
-        Serial.println("Connecting to WiFi...");
-    }
-    Serial.println("Connected to WiFi");
-
-}
 
 void setup() {
     //Establish wifi connection

@@ -1,7 +1,6 @@
 //Requirements
 #include "DHT.h"
 #include <WiFi.h>
-#include <esp_wifi.h>
 #include <ESP32_Supabase.h> 
 #include "ArduinoJson.h"
 
@@ -17,8 +16,14 @@
 ssid = Josu Laptop
 wifi_password = 12345678901
 */
-const char* ssid = "Josu Laptop";
-const char* wifi_password = "12345678901";
+/*const char* ssid = "Josu Laptop";
+const char* wifi_password = "12345678901";*/
+
+const char* ssid = "nabilsphone"; 
+const char* wifi_password = "12345678";
+
+#define SSID "nabilsphone"
+#define WIFI_PASS "12345678" 
 
 //Pin Definitions
 #define DHTPIN 4     // Digital pin connected to the DHT sensor
@@ -47,7 +52,7 @@ float hic;
 
 //Supabase API Setup
 String supabase_url = "https://xzissfgunvpzgocavmvi.supabase.co";
-String anon_key = "";
+String anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6aXNzZmd1bnZwemdvY2F2bXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTkwMzY5MjYsImV4cCI6MjAxNDYxMjkyNn0.yimNI3OEgNYs5dvwwcdO4Lr41yGEj-FE1c-tzofI4AM";
 
 // Supabase credentials
 const String email = "hello@sproutscouts.com";
@@ -59,7 +64,9 @@ DynamicJsonDocument doc(192);
 void setup() {
     //Establish wifi connection
     Serial.begin(115200);
-    WiFi.begin(ssid, wifi_password);
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect();
+    WiFi.begin(SSID, WIFI_PASS);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.println("Connecting to WiFi...");
@@ -150,6 +157,7 @@ void loop() {
     String read = db.from("plants").select("*").limit(1).doSelect();
     //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
     Serial.println(read); //read from DB
+
     
     //CREATE JSON 
     /*"created_at": "",
@@ -161,12 +169,16 @@ void loop() {
     "light": 15*/
     doc["created_at"] = "";
     doc["name"] = "Plant One";
+    doc["id"] = "";
     doc["owner_id"] = "";
     doc["temperature"] = fahr;
     doc["humidity"] = hif;
     doc["soil_moisture"] = moisture;
     doc["light"] = lightVal;
     serializeJson(doc, JSON);
+
+    Serial.println(JSON);
+
     // This prints:
     // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 

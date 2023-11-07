@@ -1,27 +1,47 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from 'react-native-elements'
+import { StyleSheet, View, Alert, FlatList, ListRenderItem, ListRenderItemInfo, Image } from 'react-native'
 import { useSession } from '../../contexts/SessionContext'
+import { Text } from '../../components/Themed'
 
-export default function Account() {
+export default function Home() {
   const { session } = useSession()
-  const [loading, setLoading] = useState(true)
-  const [plants, setPlants] = useState([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [plants, setPlants] = useState<any[]>([])
 
   useEffect(() => {
-    if (session) getProfile()
-  }, [session])
+    fetchPlants()
+  }, [])
 
-  async function getProfile() {
+  useEffect(() => {
+    const listener = supabase
+      .channel('schema-db-changes')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'plants' }, payload => {
+        const updatedPlant = payload.new
+        const newPlants = Array.from(plants).map((plant: any) => {
+          if (plant.id === updatedPlant.id) {
+            return updatedPlant
+          } else {
+            return plant
+          }
+        })
+        setPlants(newPlants)
+      })
+
+    listener.subscribe()
+
+    return () => {
+      listener.unsubscribe()
+    }
+  }, [plants])
+
+  async function fetchPlants() {
     try {
       setLoading(true)
-      if (!session?.user) throw new Error('No user on the session!')
 
-      console.log(session?.user.id)
       const { data, error, status } = await supabase
         .from('plants')
-        .select(`name`)
+        .select(`*`)
         .eq('owner_id', session?.user.id)
         .order('created_at')
 
@@ -31,7 +51,6 @@ export default function Account() {
 
       if (data) {
         setPlants(data)
-        console.log(data)
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -42,30 +61,55 @@ export default function Account() {
     }
   }
 
+  function renderPlantCard({ item }: ListRenderItemInfo<any>) {
+    return (
+      <View style={styles.plantCardContainer}>
+        <Image source={require('../../assets/images/plant.png')} style={styles.plantCardImage} resizeMode={'contain'}/>
+        <Text style={styles.plantCardTitleText}>{item.name}</Text>
+        <Text style={styles.plantCardText}>Temperature: {item.temperature}°</Text>
+        <Text style={styles.plantCardText}>Humidity: {item.humidity}</Text>
+        <Text style={styles.plantCardText}>Soil Moisture: {item.soil_moisture}</Text>
+        <Text style={styles.plantCardText}>Light: {item.light}</Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={session?.user?.email} disabled />
-      </View>
-
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
-      </View>
+      <FlatList
+        contentContainerStyle={styles.listContent}
+        data={plants}
+        renderItem={renderPlantCard}
+        refreshing={loading}
+        onRefresh={fetchPlants}
+      />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 40,
-    padding: 12,
+    flex: 1
   },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
+  listContent: {
+    padding: 15
   },
-  mt20: {
-    marginTop: 20,
+  plantCardContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderRadius: 15,
+    backgroundColor: '#fff',
+    gap: 10
   },
+  plantCardImage: {
+    width: 60,
+    height: 60
+  },
+  plantCardTitleText: {
+    fontSize: 20,
+    fontWeight: '600'
+  },
+  plantCardText: {
+    fontSize: 16
+  }
 })

@@ -3,10 +3,6 @@
 #include <WiFi.h>
 #include <ESP32_Supabase.h> 
 #include "ArduinoJson.h"
-#include <HTTPClient.h>
-#include <Wire.h>
-#include <RTClib.h>
-
 
 //Supabase DB Setup
   Supabase db; 
@@ -67,12 +63,8 @@ const String email = "adassac@outlook.com";
 const String password = "headstrong";
 HTTPClient http;
 
-//Setup for JSON Document
+//Setup for JSON
 DynamicJsonDocument doc(192);
-
-//Real Time Clock (RTC)
-RTC_DS3231 rtc;
-String t = "";
 
 void setup() {
     //Establish wifi connection
@@ -86,7 +78,7 @@ void setup() {
     }
     Serial.println("Connected to WiFi");
 
-    /*//Set pin mode for relays
+    //Set pin mode for relays
     pinMode(waterRelay, OUTPUT);
     pinMode(lightRelay, OUTPUT);
     pinMode(lightRelay, OUTPUT);
@@ -98,16 +90,7 @@ void setup() {
     //variable. This will give us a prelinary value to compare against in the loop
     digitalWrite(waterRelay, HIGH);
     digitalWrite(lightRelay, HIGH);
-    dht.begin();*/
-
-    /*if (!rtc.begin()) {
-      Serial.println("Couldn't find RTC");
-      while (1);
-    }
-    if (rtc.lostPower()) {
-      Serial.println("RTC lost power, let's set the time!");
-      rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Set the RTC to the date & time this sketch was compiled
-    }*/
+    dht.begin();
 
     // Beginning Supabase Connection
     db.begin(supabase_url, anon_key);
@@ -117,33 +100,6 @@ void setup() {
 }
 
 void loop() {
-  //REAL TIME CLOCK 
-    /*DateTime now = rtc.now();
-    t = t + (now.year(), DEC);
-    t = t + "/";
-    t = t + (now.month(), DEC);
-    t = t + "/";
-    t = t + (now.day(), DEC);
-    t = t + " ";
-    t = t + (now.hour(), DEC);
-    t = t + ":";
-    t = t + (now.minute(), DEC);
-    t = t + ":";
-    t = t + (now.second(), DEC);
-
-    /*Serial.print(now.year(), DEC);
-    Serial.print('/');
-    Serial.print(now.month(), DEC);
-    Serial.print('/');
-    Serial.print(now.day(), DEC);
-    Serial.print(" ");
-    Serial.print(now.hour(), DEC);
-    Serial.print(':');
-    Serial.print(now.minute(), DEC);
-    Serial.print(':');
-    Serial.print(now.second(), DEC);
-    Serial.println();*/
-
     //Read information from moisture sensor
     moisture = analogRead(moistSensor); // lower is wetter, higher is dryer about 1000-3000
     Serial.print("Moisture: ");
@@ -157,7 +113,7 @@ void loop() {
     }
     delay(2000);  
     
-    // Reading temperature or humidity takes about 250 milliseconds!
+    /*// Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
     humidity = dht.readHumidity();
     // Read temperature as Celsius (the default)
@@ -187,7 +143,7 @@ void loop() {
     Serial.print(hic);
     Serial.print(F("°C "));
     Serial.print(hif);
-    Serial.println(F("°F")); 
+    Serial.println(F("°F")); */
 
     lightVal = analogRead(lightSensor);
     Serial.print("Light diff: ");
@@ -213,29 +169,33 @@ void loop() {
     
     //CREATE JSON 
     JSON = "";  //Put your JSON that you want to insert rows
-    /*"created_at": "",
-    "name": "plant2",
-    "owner_id": "",
-    "temperature": 6.5,
-    "humidity": 7.5,
-    "soil_moisture": 10,
-    "light": 15*/
-
-    //doc["created_at"] = "";
-    //doc["id"] = "55e3045c-ce3e-4b1c-99cc-b3041edc3dce";
-    //doc["created_at"] = "";
-    //doc["owner_id"] = "";
-
-    /*doc["temperature"] = fahr;
-    doc["humidity"] = humidity;
-    doc["soil_moisture"] = moisture;
-    doc["light"] = lightVal;*/
-
+    /*doc["created_at"] = "";
+    doc["id"] = "55e3045c-ce3e-4b1c-99cc-b3041edc3dce";
+    doc["created_at"] = "";
+    doc["owner_id"] = "";
     doc["temperature"] = 7.1;
+    doc["humidity"] = 8.9;
+    doc["soil_moisture"] = 0;
+    doc["light"] = 2;*/
+
+    //TEST VALUES
+    /*doc["temperature"] = 7.1;
     doc["humidity"] = 8.9;
     doc["soil_moisture"] = 0;
     doc["light"] = 2;
     serializeJson(doc, JSON);
+
+    doc["temperature"] = 76.8;
+    doc["humidity"] = 60.9;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal;*/
+
+    doc["temperature"] = 76.8;
+    doc["humidity"] = 60.9;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal;
+    serializeJson(doc, JSON);
+    Serial.println(JSON);
 
     // This prints: Serial.println(JSON);
     // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}

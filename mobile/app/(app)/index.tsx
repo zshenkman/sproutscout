@@ -43,7 +43,7 @@ export default function Home() {
         .from('plants')
         .select(`*`)
         .eq('owner_id', session?.user.id)
-        .order('created_at')
+        .order('created_at', {ascending: false})
 
       if (error && status !== 406) {
         throw error
@@ -66,10 +66,10 @@ export default function Home() {
       <View style={styles.plantCardContainer}>
         <Image source={require('../../assets/images/plant.png')} style={styles.plantCardImage} resizeMode={'contain'}/>
         <Text style={styles.plantCardTitleText}>{item.name}</Text>
-        <Text style={styles.plantCardText}>Temperature: {item.temperature}°</Text>
-        <Text style={styles.plantCardText}>Humidity: {item.humidity}</Text>
-        <Text style={styles.plantCardText}>Soil Moisture: {item.soil_moisture}</Text>
-        <Text style={styles.plantCardText}>Light: {item.light}</Text>
+        <Text style={styles.plantCardText}>Temperature: <Text style={styles.plantCardValueText}>{Number(item.temperature).toPrecision(3)}° F</Text></Text>
+        <Text style={styles.plantCardText}>Humidity: <Text style={styles.plantCardValueText}>{Number(item.humidity).toPrecision(3)}%</Text></Text>
+        <Text style={styles.plantCardText}>Soil Moisture: <Text style={styles.plantCardValueText}>{item.soil_moisture} mL</Text></Text>
+        <Text style={styles.plantCardText}>Light: <Text style={styles.plantCardValueText}>{item.light}</Text></Text>
       </View>
     )
   }
@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
     flex: 1
   },
   listContent: {
-    padding: 15
+    padding: 15,
+    gap: 15
   },
   plantCardContainer: {
     paddingHorizontal: 20,
@@ -111,5 +112,8 @@ const styles = StyleSheet.create({
   },
   plantCardText: {
     fontSize: 16
+  },
+  plantCardValueText: {
+    fontWeight: '600'
   }
 })

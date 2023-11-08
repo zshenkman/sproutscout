@@ -3,9 +3,6 @@
 #include <WiFi.h>
 #include <ESP32_Supabase.h> 
 #include "ArduinoJson.h"
-#include <HTTPClient.h>
-#include <Wire.h>
-#include <RTClib.h>
 
 //Supabase DB Setup
   Supabase db; 

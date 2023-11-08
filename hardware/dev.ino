@@ -100,20 +100,20 @@ void setup() {
     digitalWrite(lightRelay, HIGH);
     dht.begin();*/
 
-    // Beginning Supabase Connection
-    db.begin(supabase_url, anon_key);
-
-    // Logging in with your account you made in Supabase
-    db.login_email(email, password);
-
-    if (!rtc.begin()) {
+    /*if (!rtc.begin()) {
       Serial.println("Couldn't find RTC");
       while (1);
     }
     if (rtc.lostPower()) {
       Serial.println("RTC lost power, let's set the time!");
       rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // Set the RTC to the date & time this sketch was compiled
-    }
+    }*/
+
+    // Beginning Supabase Connection
+    db.begin(supabase_url, anon_key);
+
+    // Logging in with your account you made in Supabase
+    db.login_email(email, password);
 }
 
 void loop() {
@@ -129,7 +129,7 @@ void loop() {
     t = t + ":";
     t = t + (now.minute(), DEC);
     t = t + ":";
-    t = t + (now.second(), DEC);*/
+    t = t + (now.second(), DEC);
 
     /*Serial.print(now.year(), DEC);
     Serial.print('/');
@@ -144,7 +144,7 @@ void loop() {
     Serial.print(now.second(), DEC);
     Serial.println();*/
 
-    /*//Read information from moisture sensor
+    //Read information from moisture sensor
     moisture = analogRead(moistSensor); // lower is wetter, higher is dryer about 1000-3000
     Serial.print("Moisture: ");
     Serial.println(moisture);
@@ -200,7 +200,6 @@ void loop() {
     {
         digitalWrite(lightRelay, HIGH); // turn off light
     }
-    */
 
     // READ FROM DB
       //query 
@@ -223,47 +222,31 @@ void loop() {
     "light": 15*/
 
     //doc["created_at"] = "";
-    //doc["name"] = "Plant Two";
-    doc["id"] = 2;
-    doc["created_at"] = "";
+    //doc["id"] = "55e3045c-ce3e-4b1c-99cc-b3041edc3dce";
+    //doc["created_at"] = "";
     //doc["owner_id"] = "";
-    //doc["temperature"] = 0;
-    //doc["humidity"] = 0;
-    //doc["soil_moisture"] = 0;
-    //doc["light"] = 0;
+
+    /*doc["temperature"] = fahr;
+    doc["humidity"] = humidity;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal;*/
+
+    doc["temperature"] = 7.1;
+    doc["humidity"] = 8.9;
+    doc["soil_moisture"] = 0;
+    doc["light"] = 2;
     serializeJson(doc, JSON);
 
-    Serial.println(JSON);
-
-    // This prints:
-    // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
+    // This prints: Serial.println(JSON);
+    // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
     //WRITE TO DB
-    table = "Plants"; //set table you wanto write to
-    code = db.insert(table, JSON, true); //write to db
-    //Print Response
+    table = "plants"; //set table you wanto write to
+    int code = db.update(table).eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").doUpdate(JSON);
+    
+    //PRINT RESPONSE CODE
     Serial.print(F("HTTP Status Code: "));
     Serial.println(code);
-
-    /*http.begin(supabase_url);
-    http.addHeader("Content-Type", "application/json");
-    http.addHeader("apikey", anon_key);
-
-    // Data to send (modify this based on your schema)
-    String postData = "{\"name\": \"plant2\"}";
-
-    int httpResponseCode = http.POST(postData);
-
-    if (httpResponseCode > 0) {
-      String response = http.getString();
-      Serial.println(httpResponseCode);
-      Serial.println(response);
-    } else {
-      Serial.print("Error on sending POST: ");
-      Serial.println(httpResponseCode);
-    }
-
-    http.end();*/
     
     //RESET
     db.urlQuery_reset();

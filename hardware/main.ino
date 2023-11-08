@@ -3,6 +3,9 @@
 #include <WiFi.h>
 #include <ESP32_Supabase.h> 
 #include "ArduinoJson.h"
+#include <HTTPClient.h>
+#include <Wire.h>
+#include <RTClib.h>
 
 //Supabase DB Setup
   Supabase db; 
@@ -17,13 +20,17 @@ ssid = Josu Laptop
 wifi_password = 12345678901
 */
 /*const char* ssid = "Josu Laptop";
-const char* wifi_password = "12345678901";*/
+const char* wifi_password = "12345678901";
 
 const char* ssid = "nabilsphone"; 
 const char* wifi_password = "12345678";
 
-#define SSID "nabilsphone"
-#define WIFI_PASS "12345678" 
+#define SSID "ufguest"
+#define WIFI_PASS ""*/
+
+//Wifi Setup
+const char* ssid = "NETGEAR24";
+const char* wifi_password = "boldapple026";
 
 //Pin Definitions
 #define DHTPIN 4     // Digital pin connected to the DHT sensor
@@ -55,10 +62,11 @@ String supabase_url = "https://xzissfgunvpzgocavmvi.supabase.co";
 String anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6aXNzZmd1bnZwemdvY2F2bXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTkwMzY5MjYsImV4cCI6MjAxNDYxMjkyNn0.yimNI3OEgNYs5dvwwcdO4Lr41yGEj-FE1c-tzofI4AM";
 
 // Supabase credentials
-const String email = "hello@sproutscouts.com";
-const String password = "test1234";
+const String email = "adassac@outlook.com";
+const String password = "headstrong";
+HTTPClient http;
 
-//Setup for JSON Document
+//Setup for JSON
 DynamicJsonDocument doc(192);
 
 void setup() {
@@ -66,7 +74,7 @@ void setup() {
     Serial.begin(115200);
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
-    WiFi.begin(SSID, WIFI_PASS);
+    WiFi.begin(ssid, wifi_password);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);
         Serial.println("Connecting to WiFi...");
@@ -86,6 +94,12 @@ void setup() {
     digitalWrite(waterRelay, HIGH);
     digitalWrite(lightRelay, HIGH);
     dht.begin();
+
+    // Beginning Supabase Connection
+    db.begin(supabase_url, anon_key);
+
+    // Logging in with your account you made in Supabase
+    db.login_email(email, password);
 }
 
 void loop() {
@@ -146,47 +160,57 @@ void loop() {
         digitalWrite(lightRelay, HIGH); // turn off light
     }
 
-    // Beginning Supabase Connection
-    db.begin(supabase_url, anon_key);
-
-    // Logging in with your account you made in Supabase
-    db.login_email(email, password);
-
     // READ FROM DB
-    //query 
-    String read = db.from("plants").select("*").limit(1).doSelect();
-    //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
-    Serial.println(read); //read from DB
+      //query 
+      //String read = db.from("plants").select("*").limit(1).doSelect();
+      //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
+      //Serial.println(read); //read from DB
+      
+    // Reset Your Query before doing everything else
+    //db.urlQuery_reset();
 
     
     //CREATE JSON 
-    /*"created_at": "",
-    "name": "plant2",
-    "owner_id": "",
-    "temperature": 6.5,
-    "humidity": 7.5,
-    "soil_moisture": 10,
-    "light": 15*/
+    JSON = "";  //Put your JSON that you want to insert rows
+    /*doc["created_at"] = "";
+    doc["id"] = "55e3045c-ce3e-4b1c-99cc-b3041edc3dce";
     doc["created_at"] = "";
-    doc["name"] = "Plant One";
-    doc["id"] = "";
     doc["owner_id"] = "";
-    doc["temperature"] = fahr;
-    doc["humidity"] = hif;
-    doc["soil_moisture"] = moisture;
-    doc["light"] = lightVal;
+    doc["temperature"] = 7.1;
+    doc["humidity"] = 8.9;
+    doc["soil_moisture"] = 0;
+    doc["light"] = 2;*/
+
+    //TEST VALUES
+    /*doc["temperature"] = 7.1;
+    doc["humidity"] = 8.9;
+    doc["soil_moisture"] = 0;
+    doc["light"] = 2;
     serializeJson(doc, JSON);
 
-    Serial.println(JSON);
+    doc["temperature"] = 76.8;
+    doc["humidity"] = 60.9;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal;*/
 
-    // This prints:
-    // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
+    doc["temperature"] = fahr;
+    doc["humidity"] = humidity;
+    doc["soil_moisture"] = moisture;
+    doc["light"] = lightVal
+
+    // This prints: Serial.println(JSON);
+    // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
     //WRITE TO DB
     table = "plants"; //set table you wanto write to
-    //JSON = "";  //Put your JSON that you want to insert rows
-    code = db.insert(table, JSON, upsert); //write to db
+    int code = db.update(table).eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").doUpdate(JSON);
+    
+    //PRINT RESPONSE CODE
+    Serial.print(F("HTTP Status Code: "));
     Serial.println(code);
+    
+    //RESET
+    db.urlQuery_reset();
 
     //delay process
     delay(30000);

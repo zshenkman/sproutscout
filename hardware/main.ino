@@ -196,7 +196,7 @@ void loop() {
     doc["temperature"] = fahr;
     doc["humidity"] = humidity;
     doc["soil_moisture"] = moisture;
-    doc["light"] = lightVal
+    doc["light"] = lightVal;
 
     // This prints: Serial.println(JSON);
     // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}

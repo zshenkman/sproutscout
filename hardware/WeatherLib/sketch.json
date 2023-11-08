@@ -1,0 +1,35 @@
+{
+  "cpu": {
+    "fqbn": "esp32:esp32:esp32wroverkit:CPUFreq=240,DebugLevel=none,EraseFlash=none,FlashFreq=80,FlashMode=qio,FlashSize=4M,PSRAM=enabled,PartitionScheme=default,UploadSpeed=115200",
+    "name": "ESP32 Wrover Kit (all versions)",
+    "type": "serial"
+  },
+  "secrets": [
+    {
+      "name": "SECRET_DEVICE_KEY",
+      "value": ""
+    },
+    {
+      "name": "SECRET_HOST",
+      "value": ""
+    },
+    {
+      "name": "SECRET_KEY",
+      "value": ""
+    },
+    {
+      "name": "SECRET_OPTIONAL_PASS",
+      "value": ""
+    },
+    {
+      "name": "SECRET_SSID",
+      "value": ""
+    }
+  ],
+  "included_libs": [
+    {
+      "name": "Time",
+      "version": "1.6.1"
+    }
+  ]
+}

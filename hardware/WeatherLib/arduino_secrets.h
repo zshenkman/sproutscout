@@ -1,0 +1,5 @@
+#define SECRET_HOST ""
+#define SECRET_KEY ""
+#define SECRET_SSID ""
+#define SECRET_OPTIONAL_PASS ""
+#define SECRET_DEVICE_KEY ""

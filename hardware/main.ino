@@ -197,6 +197,8 @@ void loop() {
     doc["humidity"] = humidity;
     doc["soil_moisture"] = moisture;
     doc["light"] = lightVal;
+    serializeJson(doc, JSON);
+    Serial.println(JSON);
 
     // This prints: Serial.println(JSON);
     // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}

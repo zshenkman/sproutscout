@@ -12,29 +12,25 @@
   int code; 
 
 //Wifi Setup
-/*
-ssid = Josu Laptop
-wifi_password = 12345678901
-*/
 /*const char* ssid = "Josu Laptop";
-const char* wifi_password = "12345678901";
-
+const char* wifi_password = "12345678901";*/
+/*
 const char* ssid = "nabilsphone"; 
-const char* wifi_password = "12345678";
+const char* wifi_password = "12345678";*/
 
-#define SSID "ufguest"
-#define WIFI_PASS ""*/
+//#define ssid "ufdevice"
+//#define wifi_password "gogators"
 
 //Wifi Setup
 const char* ssid = "NETGEAR24";
 const char* wifi_password = "boldapple026";
 
 //Pin Definitions
-#define DHTPIN 4     // Digital pin connected to the DHT sensor
+#define DHTPIN 4    // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT 11
 #define waterRelay 21
 #define moistSensor 36 // NEEDS TO BE 36
-#define lightSensor 15
+#define lightSensor 32
 #define lightRelay 23
 
 //DHT sensor
@@ -44,7 +40,7 @@ float cel;
 float fahr;
 
 //Variables for light values
-int lightInit;  // initial value
+//int lightInit;  // initial value
 int lightVal;
 
 //Variables for moisture
@@ -59,8 +55,8 @@ String supabase_url = "https://xzissfgunvpzgocavmvi.supabase.co";
 String anon_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6aXNzZmd1bnZwemdvY2F2bXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTkwMzY5MjYsImV4cCI6MjAxNDYxMjkyNn0.yimNI3OEgNYs5dvwwcdO4Lr41yGEj-FE1c-tzofI4AM";
 
 // Supabase credentials
-const String email = "adassac@outlook.com";
-const String password = "headstrong";
+const String email = "hello@sproutscouts.com";
+const String password = "test1234";
 HTTPClient http;
 
 //Setup for JSON
@@ -81,10 +77,9 @@ void setup() {
     //Set pin mode for relays
     pinMode(waterRelay, OUTPUT);
     pinMode(lightRelay, OUTPUT);
-    pinMode(lightRelay, OUTPUT);
 
     //Initialize light sensor
-    lightInit = analogRead(lightSensor);
+    //lightInit = analogRead(lightSensor);
 
     //we will take a single reading from the light sensor and store it in the lightCal        
     //variable. This will give us a prelinary value to compare against in the loop
@@ -111,26 +106,39 @@ void loop() {
         digitalWrite(waterRelay, HIGH);
         //Serial.println("Relay off");
     }
-    delay(2000);  
-    
-    /*// Reading temperature or humidity takes about 250 milliseconds!
-    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-    humidity = dht.readHumidity();
-    // Read temperature as Celsius (the default)
-    cel = dht.readTemperature();
-    // Read temperature as Fahrenheit (isFahrenheit = true)
-    fahr = dht.readTemperature(true);
 
+    //Read information from light sensor
+    lightVal = analogRead(lightSensor);
+    Serial.print("Light val: ");
+    Serial.println(lightVal);
+    if(lightVal <  2500)
+    {
+        digitalWrite(lightRelay, LOW); // turn on light
+    }
+    else
+    {
+        digitalWrite(lightRelay, HIGH); // turn off light
+    } 
+    
+    // Reading temperature or humidity takes about 250 milliseconds!
+    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+    //humidity = dht.readHumidity();
+    humidity = 13;
+    // Read temperature as Celsius (the default)
+    //cel = dht.readTemperature();
+    // Read temperature as Fahrenheit (isFahrenheit = true)
+    //fahr = dht.readTemperature(true);
+    fahr = 16;
     // Check if any reads failed and exit early (to try again).
-    if (isnan(humidity) || isnan(cel) || isnan(fahr)) {
+    /*if (isnan(humidity) || isnan(cel) || isnan(fahr)) {
         Serial.println(F("Failed to read from DHT sensor!"));
         return;
-    }
+    }*/
 
-    // Compute heat index in Fahrenheit (the default)
+    /*// Compute heat index in Fahrenheit (the default)
     hif = dht.computeHeatIndex(fahr, humidity);
     // Compute heat index in Celsius (isFahreheit = false)
-    hic = dht.computeHeatIndex(cel, humidity, false);
+    hic = dht.computeHeatIndex(cel, humidity, false);*/
 
     //Print data
     Serial.print(F("Humidity: "));
@@ -143,28 +151,74 @@ void loop() {
     Serial.print(hic);
     Serial.print(F("°C "));
     Serial.print(hif);
-    Serial.println(F("°F")); */
+    Serial.println(F("°F")); 
 
-    lightVal = analogRead(lightSensor);
-    Serial.print("Light diff: ");
-    Serial.println(lightVal - lightInit);
-    if(lightVal - lightInit <  50)
-    {
-        digitalWrite(lightRelay, LOW); // turn on light
-    }
-    else
-    {
-        digitalWrite(lightRelay, HIGH); // turn off light
-    }
-
-    // READ FROM DB
+    // READ LIGHT VALUES FROM DB
+      //Serial.println("**************READING LIGHT VALUES FROM DB***************");
       //query 
-      //String read = db.from("plants").select("*").limit(1).doSelect();
+      //String light_1 = db.from("plants").select("*").limit(1).doSelect();
       //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
-      //Serial.println(read); //read from DB
-      
-    // Reset Your Query before doing everything else
-    //db.urlQuery_reset();
+        //-------------PLANT 1-------------
+        /*String light_1 = db.from("plants").select("water_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
+        Serial.println("Light enabled for plant 1: "); //read values for plant 2 from DB
+        Serial.print(light_1); //read valyes for plant 1from DB
+        // Reset Your Query before doing everything else
+        
+        //Deserialize 
+        //DynamicJsonDocument doc(1024);
+        deserializeJson(doc, light_1);
+        bool light1_enabled = doc["light_enabled"];
+        //long time          = doc["time"];
+
+        // Reset Your Query before doing everything else
+        db.urlQuery_reset();
+
+        //-------------PLANT 2-------------
+        String light_2 = db.from("plants").select("light_enabled").eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").limit(1).doSelect();
+        Serial.println("Light enabled for plant 2: "); //read values for plant 2 from DB
+        Serial.print(light_2); //read values for plant 2 from DB
+
+        //Deserialize 
+        deserializeJson(doc, light_2);
+        bool light2_enabled = doc["light_enabled"];
+        
+        Serial.println("");
+
+
+        // Reset Your Query before doing everything else
+        db.urlQuery_reset();*/
+          
+    // READ WATER VALUES FROM DB
+      Serial.println("**************READING WATER VALUES FROM DB***************");
+      //query 
+        //-------------PLANT 1-------------
+        String water_1 = db.from("plants").select("water_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
+        Serial.println("Water enabled for plant 1: "); //read values for plant 2 from DB
+        Serial.print(water_1); //read valuees for plant 1from DB
+        
+        //Deserialize 
+        deserializeJson(doc, water_1);
+        bool water1_enabled = doc["water_enabled"];
+
+        Serial.println(water1_enabled);
+
+
+        // Reset Your Query before doing everything else
+        db.urlQuery_reset();
+
+        //-------------PLANT 2-------------
+        String water_2 = db.from("plants").select("water_enabled").eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").limit(1).doSelect();
+        Serial.println("Water enabled for plant 2: "); //read values for plant 2 from DB
+        Serial.print(water_2); //read values for plant 2 from DB
+
+        //Deserialize 
+        deserializeJson(doc, water_2);
+        bool water2_enabled = doc["water_enabled"];
+
+        Serial.println(water2_enabled);
+        
+        // Reset Your Query before doing everything else
+        db.urlQuery_reset();
 
     
     //CREATE JSON 
@@ -190,8 +244,8 @@ void loop() {
     doc["soil_moisture"] = moisture;
     doc["light"] = lightVal;*/
 
-    doc["temperature"] = 76.8;
-    doc["humidity"] = 60.9;
+    doc["temperature"] = fahr;
+    doc["humidity"] = humidity;
     doc["soil_moisture"] = moisture;
     doc["light"] = lightVal;
     serializeJson(doc, JSON);
@@ -200,17 +254,19 @@ void loop() {
     // This prints: Serial.println(JSON);
     // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
-    //WRITE TO DB
-    table = "plants"; //set table you wanto write to
-    int code = db.update(table).eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").doUpdate(JSON);
+    // WRITE TO DB
+    table = "plants"; //set table you want to write to
+    // Plant 1 ID - 55e3045c-ce3e-4b1c-99cc-b3041edc3dce
+    // Plant 2 ID - 40bd666e-436e-4544-bdee-f81cb45ff0ba
+    /*int code = db.update(table).eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").doUpdate(JSON);
     
     //PRINT RESPONSE CODE
     Serial.print(F("HTTP Status Code: "));
-    Serial.println(code);
+    Serial.println(code);*/
     
     //RESET
     db.urlQuery_reset();
 
-    //delay process
-    delay(30000);
+    //delay process - 5 seconds for demo purposes
+    delay(5000);
 }

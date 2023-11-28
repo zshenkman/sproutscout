@@ -12,13 +12,9 @@
   int code; 
 
 //Wifi Setup
-/*
-ssid = Josu Laptop
-wifi_password = 12345678901
-*/
-/*const char* ssid = "Josu Laptop";
+const char* ssid = "Josu Laptop";
 const char* wifi_password = "12345678901";
-
+/*
 const char* ssid = "nabilsphone"; 
 const char* wifi_password = "12345678";
 
@@ -26,15 +22,15 @@ const char* wifi_password = "12345678";
 #define WIFI_PASS ""*/
 
 //Wifi Setup
-const char* ssid = "NETGEAR24";
-const char* wifi_password = "boldapple026";
+//const char* ssid = "NETGEAR24";
+//const char* wifi_password = "boldapple026";
 
 //Pin Definitions
-#define DHTPIN 4     // Digital pin connected to the DHT sensor
+#define DHTPIN 4    // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT11   // DHT 11
 #define waterRelay 21
 #define moistSensor 36 // NEEDS TO BE 36
-#define lightSensor 15
+#define lightSensor 32
 #define lightRelay 23
 
 //DHT sensor
@@ -44,7 +40,7 @@ float cel;
 float fahr;
 
 //Variables for light values
-int lightInit;  // initial value
+//int lightInit;  // initial value
 int lightVal;
 
 //Variables for moisture
@@ -81,10 +77,9 @@ void setup() {
     //Set pin mode for relays
     pinMode(waterRelay, OUTPUT);
     pinMode(lightRelay, OUTPUT);
-    pinMode(lightRelay, OUTPUT);
 
     //Initialize light sensor
-    lightInit = analogRead(lightSensor);
+    //lightInit = analogRead(lightSensor);
 
     //we will take a single reading from the light sensor and store it in the lightCal        
     //variable. This will give us a prelinary value to compare against in the loop
@@ -111,7 +106,19 @@ void loop() {
         digitalWrite(waterRelay, HIGH);
         //Serial.println("Relay off");
     }
-    delay(2000);  
+
+    //Read information from light sensor
+    lightVal = analogRead(lightSensor);
+    Serial.print("Light val: ");
+    Serial.println(lightVal);
+    if(lightVal <  2500)
+    {
+        digitalWrite(lightRelay, LOW); // turn on light
+    }
+    else
+    {
+        digitalWrite(lightRelay, HIGH); // turn off light
+    } 
     
     // Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -144,18 +151,6 @@ void loop() {
     Serial.print(F("°C "));
     Serial.print(hif);
     Serial.println(F("°F")); 
-
-    lightVal = analogRead(lightSensor);
-    Serial.print("Light diff: ");
-    Serial.println(lightVal - lightInit);
-    if(lightVal - lightInit <  50)
-    {
-        digitalWrite(lightRelay, LOW); // turn on light
-    }
-    else
-    {
-        digitalWrite(lightRelay, HIGH); // turn off light
-    }
 
     // READ FROM DB
       //query 
@@ -200,9 +195,11 @@ void loop() {
     // This prints: Serial.println(JSON);
     // something like this --> {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
-    //WRITE TO DB
+    // WRITE TO DB
     table = "plants"; //set table you wanto write to
-    int code = db.update(table).eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").doUpdate(JSON);
+    // Plant 1 ID - 55e3045c-ce3e-4b1c-99cc-b3041edc3dce
+    // Plant 2 ID - 40bd666e-436e-4544-bdee-f81cb45ff0ba
+    int code = db.update(table).eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").doUpdate(JSON);
     
     //PRINT RESPONSE CODE
     Serial.print(F("HTTP Status Code: "));
@@ -211,6 +208,6 @@ void loop() {
     //RESET
     db.urlQuery_reset();
 
-    //delay process
-    delay(30000);
+    //delay process - 5 seconds for demo purposes
+    delay(5000);
 }

@@ -1,8 +1,10 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { StyleSheet, View, Alert, FlatList, ListRenderItem, ListRenderItemInfo, Image } from 'react-native'
+import { StyleSheet, View, Alert, FlatList, ListRenderItemInfo, Image, TouchableOpacity } from 'react-native'
 import { useSession } from '../../contexts/SessionContext'
 import { Text } from '../../components/Themed'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faDroplet, faDropletSlash, faLightbulb, faLightbulbSlash } from '@fortawesome/pro-regular-svg-icons'
 
 export default function Home() {
   const { session } = useSession()
@@ -86,6 +88,22 @@ export default function Home() {
       }
     })()
 
+    const toggleLight = async () => {
+      await supabase
+        .from('plants')
+        .update({ light_enabled: !item.light_enabled })
+        .eq('id', item.id)
+      item.light_enabled = !item.light_enabled
+    }
+
+    const toggleWater = async () => {
+      await supabase
+        .from('plants')
+        .update({ water_enabled: !item.water_enabled })
+        .eq('id', item.id)
+      item.water_enabled = !item.water_enabled
+    }
+
     return (
       <View style={styles.plantCardContainer}>
         <Image source={require('../../assets/images/plant.png')} style={styles.plantCardImage} resizeMode={'contain'}/>
@@ -94,6 +112,15 @@ export default function Home() {
         <Text style={styles.plantCardText}>Humidity: <Text style={styles.plantCardValueText}>{Number(item.humidity).toPrecision(3)}%</Text></Text>
         <Text style={styles.plantCardText}>Soil Moisture: <Text style={styles.plantCardValueText}>{moistureDescription} ({item.soil_moisture} mL)</Text></Text>
         <Text style={styles.plantCardText}>Light: <Text style={styles.plantCardValueText}>{lightDescription}</Text></Text>
+        <View style={styles.plantCardButtonsContainer}>
+          <TouchableOpacity style={styles.plantCardButton} onPress={toggleLight}>
+            <FontAwesomeIcon icon={item.light_enabled ? faLightbulbSlash : faLightbulb} color={'#fff'} size={18}/>
+          </TouchableOpacity>
+          <View style={styles.buttonSeperator}/>
+          <TouchableOpacity style={styles.plantCardButton} onPress={toggleWater}>
+            <FontAwesomeIcon icon={item.water_enabled ? faDropletSlash : faDroplet} color={'#fff'} size={18}/>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -139,5 +166,23 @@ const styles = StyleSheet.create({
   },
   plantCardValueText: {
     fontWeight: '600'
+  },
+  plantCardButtonsContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#009E60',
+    overflow: 'hidden'
+  },
+  plantCardButton: {
+    padding: 10
+  },
+  buttonSeperator: {
+    height: '70%',
+    width: 1,
+    backgroundColor: '#fff'
   }
 })

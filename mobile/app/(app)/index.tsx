@@ -78,13 +78,13 @@ export default function Home() {
 
     const moistureDescription = (() => {
       if (item.soil_moisture <= 1500) {
-        return "Wet"
+        return "Dry"
       }
       else if (item.soil_moisture <= 3000) {
         return "Damp"
       }
       else if (item.soil_moisture > 3000) {
-        return "Dry"
+        return "Wet"
       }
     })()
 

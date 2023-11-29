@@ -58,7 +58,8 @@ const String password = "test1234";
 HTTPClient http;
 
 //Setup for JSON
-DynamicJsonDocument doc(192);
+DynamicJsonDocument readDoc(192);
+DynamicJsonDocument writeDoc(192);
 
 void setup() {
     //Establish wifi connection
@@ -149,11 +150,11 @@ void loop() {
     doc["soil_moisture"] = moisture;
     doc["light"] = lightVal;*/
 
-    doc["temperature"] = fahr;
-    doc["humidity"] = humidity;
-    doc["soil_moisture"] = moisture;
-    doc["light"] = lightVal;
-    serializeJson(doc, JSON);
+    writeDoc["temperature"] = fahr;
+    writeDoc["humidity"] = humidity;
+    writeDoc["soil_moisture"] = moisture;
+    writeDoc["light"] = lightVal;
+    serializeJson(writeDoc, JSON);
     Serial.print(F("JSON to DB: "));
     Serial.println(JSON);
 
@@ -171,7 +172,7 @@ void loop() {
     db.urlQuery_reset();
 
     // READ LIGHT VALUES FROM DB
-        Serial.println("**************LIGHT WATER VALUES FROM DB***************");
+        Serial.println("**************READ LIGHT WATER VALUES FROM DB***************");
         //-------------PLANT 1-------------
         String light_1 = db.from("plants").select("light_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
         Serial.println("Light enabled for plant 1: "); //read values for plant 2 from DB
@@ -182,8 +183,8 @@ void loop() {
         light_1 = light_1.substring(0, light_1.length() - 1);
         
         //Deserialize 
-        deserializeJson(doc, light_1);
-        bool light1_enabled = doc["light_enabled"];
+        deserializeJson(readDoc, light_1);
+        bool light1_enabled = readDoc["light_enabled"];
         Serial.println(light1_enabled);
 
         // Reset Your Query before doing everything else
@@ -199,8 +200,8 @@ void loop() {
         light_2 = light_2.substring(0, light_2.length() - 1);
         
         //Deserialize 
-        deserializeJson(doc, light_2);
-        bool light2_enabled = doc["light_enabled"];
+        deserializeJson(readDoc, light_2);
+        bool light2_enabled = readDoc["light_enabled"];
         Serial.println(light2_enabled);
 
         // Reset Your Query before doing everything else
@@ -218,8 +219,8 @@ void loop() {
         water_1 = water_1.substring(0, water_1.length() - 1);
         
         // Deserialize the JSON document
-        deserializeJson(doc, water_1);
-        bool water1_enabled = doc["water_enabled"];
+        deserializeJson(readDoc, water_1);
+        bool water1_enabled = readDoc["water_enabled"];
         Serial.println(water1_enabled);
 
         // Reset Your Query before doing everything else
@@ -235,8 +236,8 @@ void loop() {
         water_2 = water_2.substring(0, water_2.length() - 1);
 
         //Deserialize 
-        deserializeJson(doc, water_2);
-        bool water2_enabled = doc["water_enabled"];
+        deserializeJson(readDoc, water_2);
+        bool water2_enabled = readDoc["water_enabled"];
 
         Serial.println(water2_enabled);
         

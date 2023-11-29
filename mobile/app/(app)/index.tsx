@@ -78,13 +78,13 @@ export default function Home() {
 
     const moistureDescription = (() => {
       if (item.soil_moisture <= 1500) {
-        return "Dry"
+        return "Wet"
       }
       else if (item.soil_moisture <= 3000) {
         return "Damp"
       }
       else if (item.soil_moisture > 3000) {
-        return "Wet"
+        return "Dry"
       }
     })()
 
@@ -110,7 +110,7 @@ export default function Home() {
         <Text style={styles.plantCardTitleText}>{item.name}</Text>
         <Text style={styles.plantCardText}>Temperature: <Text style={styles.plantCardValueText}>{Number(item.temperature).toPrecision(3)}° F</Text></Text>
         <Text style={styles.plantCardText}>Humidity: <Text style={styles.plantCardValueText}>{Number(item.humidity).toPrecision(3)}%</Text></Text>
-        <Text style={styles.plantCardText}>Soil Moisture: <Text style={styles.plantCardValueText}>{moistureDescription} ({item.soil_moisture} mL)</Text></Text>
+        <Text style={styles.plantCardText}>Soil Moisture: <Text style={styles.plantCardValueText}>{moistureDescription}</Text></Text>
         <Text style={styles.plantCardText}>Light: <Text style={styles.plantCardValueText}>{lightDescription}</Text></Text>
         <View style={styles.plantCardButtonsContainer}>
           <TouchableOpacity style={styles.plantCardButton} onPress={toggleLight}>

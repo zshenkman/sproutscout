@@ -172,7 +172,7 @@ void loop() {
     db.urlQuery_reset();
 
     // READ LIGHT VALUES FROM DB
-        Serial.println("**************READ LIGHT WATER VALUES FROM DB***************");
+        Serial.println("**************READING LIGHT WATER VALUES FROM DB***************");
         //-------------PLANT 1-------------
         String light_1 = db.from("plants").select("light_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
         Serial.println("Light enabled for plant 1: "); //read values for plant 2 from DB
@@ -245,7 +245,7 @@ void loop() {
         db.urlQuery_reset();
 
     //ACTIVATE WATER RELAY
-    if (water1_enabled) {
+    if (water2_enabled) {
       digitalWrite(waterRelay, HIGH);
     }
     else {

@@ -159,7 +159,7 @@ void loop() {
       //String light_1 = db.from("plants").select("*").limit(1).doSelect();
       //.eq("name", "value").order("name", "asc", true).limit(1).doSelect();
         //-------------PLANT 1-------------
-        /*String light_1 = db.from("plants").select("water_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
+        String light_1 = db.from("plants").select("water_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
         Serial.println("Light enabled for plant 1: "); //read values for plant 2 from DB
         Serial.print(light_1); //read valyes for plant 1from DB
         // Reset Your Query before doing everything else
@@ -186,13 +186,13 @@ void loop() {
 
 
         // Reset Your Query before doing everything else
-        db.urlQuery_reset();*/
+        db.urlQuery_reset();
           
     // READ WATER VALUES FROM DB
       Serial.println("**************READING WATER VALUES FROM DB***************");
       //query 
         //-------------PLANT 1-------------
-        String water_1 = db.from("plants").select("water_enabled").eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").order("id", "asc", true).limit(1).doSelect();
+        String water_1 = db.from("plants").select("water_enabled").eq("id", "55e3045c-ce3e-4b1c-99cc-b3041edc3dce").order("id", "asc", true).limit(1).doSelect();
         Serial.println("Water enabled for plant 1: "); //read values for plant 2 from DB
         //Serial.print(water_1); //read valuees for plant 1from DB
         
@@ -201,21 +201,6 @@ void loop() {
         water_1 = water_1.substring(0, water_1.length() - 1);
         
         // Deserialize the JSON document
-        //DynamicJsonDocument doc(1024);
-        //DeserializationError error = deserializeJson(doc, water_1);
-
-        // Test if parsing succeeds.
-        /*if (error) {
-          Serial.println(F("deserializeJson() failed: "));
-          //Serial.println(error.f_str());
-          return;
-        }
-        else {
-          deserializeJson(doc, water_1);
-          bool water1_enabled = doc["water_enabled"];
-          Serial.println(water1_enabled);
-        }*/
-
         deserializeJson(doc, water_1);
         bool water1_enabled = doc["water_enabled"];
         Serial.println(water1_enabled);
@@ -224,9 +209,13 @@ void loop() {
         db.urlQuery_reset();
 
         //-------------PLANT 2-------------
-        /*String water_2 = db.from("plants").select("water_enabled").eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").limit(1).doSelect();
+        String water_2 = db.from("plants").select("water_enabled").eq("id", "40bd666e-436e-4544-bdee-f81cb45ff0ba").limit(1).doSelect();
         Serial.println("Water enabled for plant 2: "); //read values for plant 2 from DB
-        Serial.print(water_2); //read values for plant 2 from DB
+        //Serial.print(water_2); //read values for plant 2 from DB
+
+        // Remove brackets 
+        water_2 = water_2.substring(1);
+        water_2 = water_2.substring(0, water_2.length() - 1);
 
         //Deserialize 
         deserializeJson(doc, water_2);
@@ -235,8 +224,23 @@ void loop() {
         Serial.println(water2_enabled);
         
         // Reset Your Query before doing everything else
-        db.urlQuery_reset();*/
+        db.urlQuery_reset();
 
+    //ACTIVATE WATER RELAY
+    if (water_2) {
+      digitalWrite(waterRelay, HIGH);
+    }
+    else {
+      digitalWrite(waterRelay, LOW);
+    }
+    
+    //ACTIVATE LIGHT RELAY
+    if (light_2) {
+      digitalWrite(LightRelay, HIGH);
+    }
+    else {
+      digitalWrite(LightRela, LOW);
+    }
     
     //CREATE JSON 
     JSON = "";  //Put your JSON that you want to insert rows
@@ -285,5 +289,5 @@ void loop() {
     db.urlQuery_reset();
 
     //delay process - 5 seconds for demo purposes
-    delay(5000);
+    //delay(3000);
 }
